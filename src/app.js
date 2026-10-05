@@ -8,6 +8,14 @@ function calculateTotal(items) {
   return items.reduce((total, item) => total + item.price * item.quantity, 0);
 }
 
+// Middleware pour parser le JSON (doit être placé en haut avant les routes)
+app.use(express.json());
+
+// Stockage centralisé des tâches pour toute l'application
+const tasks = [
+  { id: 1, title: "Tâche 1", completed: false }
+];
+
 app.get("/", (_req, res) => {
   res.json({
     service: "devops-platform-challenge",
@@ -27,41 +35,52 @@ app.get("/total", (_req, res) => {
 
   res.json({ total: calculateTotal(items) });
 });
-// Middleware pour parser le JSON
-app.use(express.json());
 
-// Stockage temporaire des tâches
-const tasks = [];
+// GET /tasks - Lister les tâches
+app.get('/tasks', (req, res) => {
+    res.status(200).json(tasks);
+});
 
-// Route POST /tasks pour créer une tâche
+// POST /tasks - Créer une tâche
 app.post("/tasks", (req, res) => {
   const { title } = req.body;
 
-  // Validation : si le titre est absent ou vide, on renvoie une erreur 400
   if (!title || title.trim() === "") {
     return res.status(400).json({ error: "Title is required" });
   }
 
-  // Création de la tâche avec un ID unique
   const newTask = {
-    id: Date.now().toString(),
-    title: title.trim()
+    id: tasks.length > 0 ? Math.max(...tasks.map(t => typeof t.id === 'number' ? t.id : 1)) + 1 : 1,
+    title: title.trim(),
+    completed: false
   };
 
   tasks.push(newTask);
   return res.status(201).json(newTask);
 });
 
-// Exemple de code à ajouter pour l'Issue #1
-app.get('/tasks', (req, res) => {
-    const tasks = [
-        { id: 1, title: "Tâche 1", completed: false }
-    ];
-    res.status(200).json(tasks);
+// PATCH /tasks/:id - Issue #3 : Marquer une tâche comme complétée
+app.patch("/tasks/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const { completed } = req.body;
+
+  // Critère : Invalid input returns HTTP 400
+  if (typeof completed !== 'boolean') {
+    return res.status(400).json({ error: "Invalid input: 'completed' must be a boolean" });
+  }
+
+  const task = tasks.find((t) => t.id === id);
+
+  // Critère : Unknown task returns HTTP 404
+  if (!task) {
+    return res.status(404).json({ error: "Task not found" });
+  }
+
+  task.completed = completed;
+  return res.status(200).json(task);
 });
 
-const tasks = [];
-
+// DELETE /tasks/:id - Supprimer une tâche
 app.delete("/tasks/:id", (req, res) => {
   const id = Number(req.params.id);
   const index = tasks.findIndex((task) => task.id === id);
@@ -80,9 +99,4 @@ if (require.main === module) {
   });
 }
 
- feature/delete-task
 module.exports = { app, calculateTotal, tasks };
-
-module.exports = { app, calculateTotal };
-
-main
