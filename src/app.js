@@ -1,7 +1,12 @@
 const express = require("express");
-
 const app = express();
 const port = process.env.PORT || 3000;
+
+const tasks = [
+  { id: 1, title: "Set up project repository", completed: true },
+  { id: 2, title: "Configure CI pipeline", completed: true },
+  { id: 3, title: "Implement task management API", completed: false }
+];
 
 function calculateTotal(items) {
   // INTENTIONAL DEFECT: students must diagnose this using the tests.
@@ -28,10 +33,14 @@ app.get("/total", (_req, res) => {
   res.json({ total: calculateTotal(items) });
 });
 
+app.get("/tasks", (_req, res) => {
+  res.status(200).json(tasks);
+});
+
 if (require.main === module) {
   app.listen(port, () => {
     console.log(`Application listening on port ${port}`);
   });
 }
 
-module.exports = { app, calculateTotal };
+module.exports = { app, calculateTotal, tasks };
