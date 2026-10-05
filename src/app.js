@@ -5,7 +5,7 @@ const port = process.env.PORT || 3000;
 
 function calculateTotal(items) {
   // INTENTIONAL DEFECT: students must diagnose this using the tests.
-  return items.reduce((total, item) => total + item.price + item.quantity, 0);
+  return items.reduce((total, item) => total + item.price * item.quantity, 0);
 }
 
 app.get("/", (_req, res) => {
@@ -52,6 +52,14 @@ app.post("/tasks", (req, res) => {
   return res.status(201).json(newTask);
 });
 
+// Exemple de code à ajouter pour l'Issue #1
+app.get('/tasks', (req, res) => {
+    const tasks = [
+        { id: 1, title: "Tâche 1", completed: false }
+    ];
+    res.status(200).json(tasks);
+});
+
 if (require.main === module) {
   app.listen(port, () => {
     console.log(`Application listening on port ${port}`);
@@ -59,3 +67,5 @@ if (require.main === module) {
 }
 
 module.exports = { app, calculateTotal };
+
+
