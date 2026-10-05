@@ -1,0 +1,14 @@
+# Default owner
+* @TealOrchid @adawnium @blanche699 @smashanto
+
+# Platform configuration
+/.github/ @adawnium
+
+# Application code
+/src/ @TealOrchid
+
+# Tests
+/test/ @blanche699 
+
+# Deployment configuration
+/deploy/ @smashanto
