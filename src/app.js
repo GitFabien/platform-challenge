@@ -2,6 +2,10 @@ const express = require("express");
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Enable JSON body parsing so req.body is accessible
+app.use(express.json());
+
 const tasks = [
   { id: 1, title: "Set up project", completed: false }
 ];
@@ -13,6 +17,28 @@ function calculateTotal(items) {
 
 app.get("/tasks", (_req, res) => {
   res.json(tasks);
+});
+
+// Issue #2: Create a task
+app.post("/tasks", (req, res) => {
+  const { title } = req.body || {};
+
+  // Check if title is missing, not a string, or contains only whitespace
+  if (!title || typeof title !== "string" || title.trim() === "") {
+    return res.status(400).json({ error: "Title is required" });
+  }
+
+  // Generate an ID (e.g. numeric sequence based on existing IDs or timestamp)
+  const nextId = tasks.length > 0 ? Math.max(...tasks.map((t) => Number(t.id))) + 1 : 1;
+
+  const newTask = {
+    id: nextId,
+    title: title.trim(),
+    completed: false
+  };
+
+  tasks.push(newTask);
+  return res.status(201).json(newTask);
 });
 
 app.get("/", (_req, res) => {
