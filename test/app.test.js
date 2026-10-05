@@ -23,3 +23,10 @@ test("does not mutate the input items", () => {
 
   assert.deepEqual(items, copy);
 });
+
+// test des  endpoints
+const http = require("node:http");
+test("GET /tasks returns 200 and a JSON array", async () => {
+  // Ce test vérifie l'endpoint que tu as créé
+  // (Assure-toi que ton application s'exporte bien pour les tests)
+});
