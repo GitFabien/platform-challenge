@@ -1,0 +1,13 @@
+node_modules
+npm-debug.log*
+.git
+.github
+terraform
+STUDENT_CHALLENGE.md
+coverage
+.env
+.env.*
+.vscode
+.idea
+Dockerfile
+.dockerignore
