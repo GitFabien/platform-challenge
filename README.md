@@ -173,7 +173,7 @@ This helps ensure that each code change is verified before being merged.
 
 ## Terraform explanation
 
-This project includes a Terraform configuration under the `terraform/` directory. The goal is not to deploy infrastructure to a cloud provider, but to validate that the configuration is syntactically correct and follows Terraform conventions.
+This project includes a Terraform configuration under the `terraform/` directory. The goal is not to deploy infrastructure to a cloud provider, but to validate that the configuration is correct and follows Terraform conventions.
 
 ### Files
 
