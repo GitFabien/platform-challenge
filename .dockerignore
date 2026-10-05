@@ -1,0 +1,17 @@
+node_modules
+npm-debug.log*
+coverage
+
+.git
+.gitignore
+.github
+
+test
+terraform
+.terraform
+
+Dockerfile
+.dockerignore
+*.md
+eslint.config.mjs
+.env*
