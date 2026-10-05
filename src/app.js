@@ -60,12 +60,29 @@ app.get('/tasks', (req, res) => {
     res.status(200).json(tasks);
 });
 
+const tasks = [];
+
+app.delete("/tasks/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const index = tasks.findIndex((task) => task.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ error: "Task not found" });
+  }
+
+  tasks.splice(index, 1);
+  return res.status(204).end();
+});
+
 if (require.main === module) {
   app.listen(port, () => {
     console.log(`Application listening on port ${port}`);
   });
 }
 
+ feature/delete-task
+module.exports = { app, calculateTotal, tasks };
+
 module.exports = { app, calculateTotal };
 
-
+main
