@@ -1,0 +1,22 @@
+# Global default owners for the entire repository
+* @aldi-octet @mahutonbks @pupuceee @calypso27
+
+# Node.js application and tests
+/src/ @aldi-octet
+/test/ @mahutonbks
+package.json @pupuceee
+package-lock.json @calypso27
+
+# Docker configuration and container CI
+Dockerfile @aldi-octet
+.dockerignore @mahutonbks
+.github/workflows/docker.yml @pupuceee
+.github/workflows/node.yml @calypso27
+
+# Terraform configuration and infrastructure CI
+terraform/*.tf @calypso27
+terraform/*.tfvars @aldi-octet
+.github/workflows/terraform.yml @mahutonbks
+
+# GitHub repository metadata
+.github/ @pupuceee
