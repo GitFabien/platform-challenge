@@ -44,3 +44,33 @@ test("GET /tasks returns a list of tasks", async () => {
     server.close();
   }
 });
+
+test("DELETE /tasks/:id deletes an existing task", async () => {
+  const server = app.listen(0);
+
+  try {
+    const port = server.address().port;
+    const response = await fetch(`http://localhost:${port}/tasks/1`, {
+      method: "DELETE"
+    });
+
+    assert.equal(response.status, 204);
+  } finally {
+    server.close();
+  }
+});
+
+test("DELETE /tasks/:id returns 404 for an unknown task", async () => {
+  const server = app.listen(0);
+
+  try {
+    const port = server.address().port;
+    const response = await fetch(`http://localhost:${port}/tasks/999`, {
+      method: "DELETE"
+    });
+
+    assert.equal(response.status, 404);
+  } finally {
+    server.close();
+  }
+});
