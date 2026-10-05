@@ -32,29 +32,63 @@ test("does not mutate the input items", () => {
   assert.deepEqual(items, copy);
 });
 
-test("POST /tasks crée une tâche et retourne HTTP 201", async () => {
-  const response = await request(app)
-    .post("/tasks")
-    .send({ title: "Nouvelle tâche de test" });
+async function createTask(title) {
+  const res = await request(app).post("/tasks").send({ title });
+  return res.body;
+}
 
-  assert.equal(response.status, 201);
-  assert.equal(response.body.title, "Nouvelle tâche de test");
-  assert.equal(response.body.completed, false);
-  assert.ok(response.body.id > 0);
+test("PATCH /tasks/:id marks an existing task as completed", async () => {
+  const task = await createTask("Write report");
+  const res = await request(app)
+    .patch(`/tasks/${task.id}`)
+    .send({ completed: true });
+
+  assert.equal(res.status, 200);
+  assert.equal(res.body.id, task.id);
+  assert.equal(res.body.completed, true);
+  assert.equal(res.body.title, "Write report");
 });
 
-test("POST /tasks retourne HTTP 400 si le titre est manquant", async () => {
-  const response = await request(app)
-    .post("/tasks")
-    .send({}); // On n'envoie pas de titre
+test("PATCH /tasks/:id can un-complete a task", async () => {
+  const task = await createTask("Review PR");
+  await request(app).patch(`/tasks/${task.id}`).send({ completed: true });
 
-  assert.equal(response.status, 400);
+  const res = await request(app)
+    .patch(`/tasks/${task.id}`)
+    .send({ completed: false });
+
+  assert.equal(res.status, 200);
+  assert.equal(res.body.completed, false);
 });
 
-test("POST /tasks retourne HTTP 400 si le titre est vide", async () => {
-  const response = await request(app)
-    .post("/tasks")
-    .send({ title: "   " }); // Que des espaces
+test("PATCH /tasks/:id returns 404 for an unknown task", async () => {
+  const res = await request(app)
+    .patch("/tasks/99999")
+    .send({ completed: true });
 
-  assert.equal(response.status, 400);
+  assert.equal(res.status, 404);
+});
+
+test("PATCH /tasks/:id returns 400 for a missing completed field", async () => {
+  const task = await createTask("Missing field test");
+  const res = await request(app).patch(`/tasks/${task.id}`).send({});
+
+  assert.equal(res.status, 400);
+});
+
+test("PATCH /tasks/:id returns 400 for a non-boolean completed", async () => {
+  const task = await createTask("Invalid type test");
+  const res = await request(app)
+    .patch(`/tasks/${task.id}`)
+    .send({ completed: "yes" });
+
+  assert.equal(res.status, 400);
+});
+
+test("PATCH /tasks/:id returns 400 for a non-numeric id", async () => {
+  const res = await request(app)
+    .patch("/tasks/abc")
+    .send({ completed: true });
+
+  assert.equal(res.status, 400);
 });

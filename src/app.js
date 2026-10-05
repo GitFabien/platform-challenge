@@ -8,10 +8,12 @@ const tasks = [
   { id: 2, title: "Configure CI pipeline", completed: true },
   { id: 3, title: "Implement task management API", completed: false }
 ];
+let nextId = 4;
 
 function calculateTotal(items) {
   return items.reduce((total, item) => total + item.price * item.quantity, 0);
 }
+app.use(express.json());
 
 app.get("/", (_req, res) => {
   res.json({
@@ -39,23 +41,33 @@ app.get("/tasks", (_req, res) => {
 
 app.post("/tasks", (req, res) => {
   const { title } = req.body;
+  if (!title || typeof title !== "string" || title.trim() === "") {
+    return res.status(400).json({ error: "Title is required" });
+  }
+  const newTask = { id: nextId++, title: title.trim(), completed: false };
+  tasks.push(newTask);
+  res.status(201).json(newTask);
+});
 
-  if (!title || title.trim() === "") {
-    return res.status(400).json({ error: "Le titre est obligatoire" });
+app.patch("/tasks/:id", (req, res) => {
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id)) {
+    return res.status(400).json({ error: "Invalid task id" });
   }
 
-  const maxId = tasks.reduce((max, task) => Math.max(max, task.id), 0);
-  const newId = maxId + 1;
+  const task = tasks.find((t) => t.id === id);
+  if (!task) {
+    return res.status(404).json({ error: "Task not found" });
+  }
 
-  const newTask = {
-    id: newId,
-    title: title.trim(),
-    completed: false
-  };
+  const { completed } = req.body ?? {};
+  if (typeof completed !== "boolean") {
+    return res.status(400).json({ error: "completed must be a boolean" });
+  }
 
-  tasks.push(newTask);
-
-  res.status(201).json(newTask);
+  task.completed = completed;
+  res.status(200).json(task);
 });
 
 if (require.main === module) {
