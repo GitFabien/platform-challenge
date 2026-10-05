@@ -21,6 +21,6 @@ labels: bug
 
 ## Acceptance criteria
 - [ ] npm test passes
-- [ ] <!-- other criterion -->
+- [ ] 
 
 ## Additional context
