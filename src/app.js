@@ -3,10 +3,20 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
 
+const tasks = [
+  { id: 1, title: "Configurer le projet", completed: true },
+  { id: 2, title: "Ajouter l'API des tâches", completed: false },
+  { id: 3, title: "Écrire les tests", completed: false }
+];
+
 function calculateTotal(items) {
   // INTENTIONAL DEFECT: students must diagnose this using the tests.
-  return items.reduce((total, item) => total + item.price + item.quantity, 0);
+  return items.reduce((total, item) => total + item.price * item.quantity, 0);
 }
+
+app.get("/tasks", (_req, res) => {
+  res.json(tasks);
+});
 
 app.get("/", (_req, res) => {
   res.json({
