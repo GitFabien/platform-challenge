@@ -5,9 +5,9 @@
 
 | Prefix     | Purpose                     | Example                  |
 |------------|-----------------------------|--------------------------|
-| `feature/` | New functionality           | `feature/7-list-tasks`   |
-| `fix/`     | Bug fixes                   | `fix/3-failing-test`     |
-| `chore/`   | CI, Docker, Terraform, docs | `chore/node-ci`          |
+| `feature/` | New functionality           | `feature/9-list-tasks`   |
+| `fix/`     | Bug fixes                   | `fix/1-failing-test`     |
+| `chore/`   | CI, Docker, Terraform, docs | `chore/14-docker-ci`          |
 
 - Branch from an up-to-date `main` and put the issue number in the branch name.
 - One branch = one issue = one purpose.
