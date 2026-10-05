@@ -31,3 +31,30 @@ test("does not mutate the input items", () => {
 
   assert.deepEqual(items, copy);
 });
+
+test("POST /tasks crée une tâche et retourne HTTP 201", async () => {
+  const response = await request(app)
+    .post("/tasks")
+    .send({ title: "Nouvelle tâche de test" });
+
+  assert.equal(response.status, 201);
+  assert.equal(response.body.title, "Nouvelle tâche de test");
+  assert.equal(response.body.completed, false);
+  assert.ok(response.body.id > 0);
+});
+
+test("POST /tasks retourne HTTP 400 si le titre est manquant", async () => {
+  const response = await request(app)
+    .post("/tasks")
+    .send({}); // On n'envoie pas de titre
+
+  assert.equal(response.status, 400);
+});
+
+test("POST /tasks retourne HTTP 400 si le titre est vide", async () => {
+  const response = await request(app)
+    .post("/tasks")
+    .send({ title: "   " }); // Que des espaces
+
+  assert.equal(response.status, 400);
+});
