@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { calculateTotal } = require("../src/app");
+const { app, calculateTotal } = require("../src/app");
 
 test("calculates the total for several items", () => {
   const items = [
@@ -22,4 +22,42 @@ test("does not mutate the input items", () => {
   calculateTotal(items);
 
   assert.deepEqual(items, copy);
+});
+
+test("POST /tasks creates a task and returns 201", async () => {
+  const server = app.listen(0);
+  const { port } = server.address();
+
+  try {
+    const res = await fetch(`http://localhost:${port}/tasks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Write tests" })
+    });
+
+    assert.equal(res.status, 201);
+    const data = await res.json();
+    assert.ok(data.id);
+    assert.equal(data.title, "Write tests");
+    assert.equal(data.completed, false);
+  } finally {
+    server.close();
+  }
+});
+
+test("POST /tasks returns 400 when title is missing or empty", async () => {
+  const server = app.listen(0);
+  const { port } = server.address();
+
+  try {
+    const res = await fetch(`http://localhost:${port}/tasks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "" })
+    });
+
+    assert.equal(res.status, 400);
+  } finally {
+    server.close();
+  }
 });
