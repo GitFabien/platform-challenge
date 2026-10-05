@@ -14,6 +14,14 @@ app.get("/", (_req, res) => {
   });
 });
 
+app.get("/tasks", (_req, res) => {
+  res.json([
+    { id: 1, title: "Task 1", completed: false },
+    { id: 2, title: "Task 2", completed: true },
+  ]);
+});
+
+
 app.get("/health", (_req, res) => {
   res.json({ status: "healthy" });
 });
