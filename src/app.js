@@ -90,3 +90,18 @@ if (require.main === module) {
 }
 
 module.exports = { app, calculateTotal };
+
+
+app.delete("/tasks/:id", (req, res) => {
+  const taskId = parseInt(req.params.id, 10);
+
+  const taskIndex = tasks.findIndex((task) => task.id === taskId);
+
+  if (taskIndex === -1) {
+    return res.status(404).json({ error: "Task not found" });
+  }
+
+  tasks.splice(taskIndex, 1);
+
+  return res.status(204).send();
+});

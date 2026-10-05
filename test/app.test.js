@@ -167,3 +167,50 @@ test("returns 400 when completing a task with invalid input", async () => {
   assert.equal(response1.status, 400);
   assert.equal(response2.status, 400);
 });
+
+test("deletes an existing task and returns 204", async () => {
+  const server = await new Promise((resolve) => {
+    const instance = app.listen(0, () => resolve(instance));
+  });
+
+  const createResponse = await fetch(
+    `http://localhost:${server.address().port}/tasks`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title: "Task to delete" }),
+    },
+  );
+
+  const createdTask = await createResponse.json();
+
+  const deleteResponse = await fetch(
+    `http://localhost:${server.address().port}/tasks/${createdTask.id}`,
+    {
+      method: "DELETE",
+    },
+  );
+
+  server.close();
+
+  assert.equal(deleteResponse.status, 204);
+});
+
+test("returns 404 when deleting a non-existent task", async () => {
+  const server = await new Promise((resolve) => {
+    const instance = app.listen(0, () => resolve(instance));
+  });
+
+  const response = await fetch(
+    `http://localhost:${server.address().port}/tasks/999`,
+    {
+      method: "DELETE",
+    },
+  );
+
+  server.close();
+
+  assert.equal(response.status, 404);
+});
