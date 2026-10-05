@@ -27,6 +27,30 @@ app.get("/total", (_req, res) => {
 
   res.json({ total: calculateTotal(items) });
 });
+// Middleware pour parser le JSON
+app.use(express.json());
+
+// Stockage temporaire des tâches
+const tasks = [];
+
+// Route POST /tasks pour créer une tâche
+app.post("/tasks", (req, res) => {
+  const { title } = req.body;
+
+  // Validation : si le titre est absent ou vide, on renvoie une erreur 400
+  if (!title || title.trim() === "") {
+    return res.status(400).json({ error: "Title is required" });
+  }
+
+  // Création de la tâche avec un ID unique
+  const newTask = {
+    id: Date.now().toString(),
+    title: title.trim()
+  };
+
+  tasks.push(newTask);
+  return res.status(201).json(newTask);
+});
 
 if (require.main === module) {
   app.listen(port, () => {
