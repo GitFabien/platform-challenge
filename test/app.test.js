@@ -24,7 +24,6 @@ test("does not mutate the input items", () => {
   assert.deepEqual(items, copy);
 });
 
-
 test("tasks returns a list", async () => {
   const server = await new Promise((resolve) => {
     const instance = app.listen(0, () => resolve(instance));
@@ -89,4 +88,82 @@ test("creates a task", async () => {
   assert.equal(response.status, 201);
   assert.equal(task.title, "New task");
   assert.equal(typeof task.id, "number");
+});
+
+test("updates a task completed status and returns 200", async () => {
+  const server = await new Promise((resolve) => {
+    const instance = app.listen(0, () => resolve(instance));
+  });
+
+  const response = await fetch(
+    `http://localhost:${server.address().port}/tasks/1`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ completed: true }),
+    },
+  );
+
+  const updatedTask = await response.json();
+  server.close();
+
+  assert.equal(response.status, 200);
+  assert.equal(updatedTask.id, 1);
+  assert.equal(updatedTask.completed, true);
+});
+
+test("returns 404 when updating a non-existent task", async () => {
+  const server = await new Promise((resolve) => {
+    const instance = app.listen(0, () => resolve(instance));
+  });
+
+  const response = await fetch(
+    `http://localhost:${server.address().port}/tasks/999`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ completed: true }),
+    },
+  );
+
+  server.close();
+
+  assert.equal(response.status, 404);
+});
+
+test("returns 400 when completing a task with invalid input", async () => {
+  const server = await new Promise((resolve) => {
+    const instance = app.listen(0, () => resolve(instance));
+  });
+
+  const response1 = await fetch(
+    `http://localhost:${server.address().port}/tasks/1`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ completed: "true" }),
+    },
+  );
+
+  const response2 = await fetch(
+    `http://localhost:${server.address().port}/tasks/1`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    },
+  );
+
+  server.close();
+
+  assert.equal(response1.status, 400);
+  assert.equal(response2.status, 400);
 });
