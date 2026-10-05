@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+app.use(express.json());
 const port = process.env.PORT || 3000;
 
 const tasks = [
@@ -34,6 +35,27 @@ app.get("/total", (_req, res) => {
 
 app.get("/tasks", (_req, res) => {
   res.status(200).json(tasks);
+});
+
+app.post("/tasks", (req, res) => {
+  const { title } = req.body;
+
+  if (!title || title.trim() === "") {
+    return res.status(400).json({ error: "Le titre est obligatoire" });
+  }
+
+  const maxId = tasks.reduce((max, task) => Math.max(max, task.id), 0);
+  const newId = maxId + 1;
+
+  const newTask = {
+    id: newId,
+    title: title.trim(),
+    completed: false
+  };
+
+  tasks.push(newTask);
+
+  res.status(201).json(newTask);
 });
 
 if (require.main === module) {
