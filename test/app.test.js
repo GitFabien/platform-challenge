@@ -23,12 +23,13 @@ test("does not mutate the input items", () => {
 
   assert.deepEqual(items, copy);
 });
+
 test("GET /tasks returns a JSON array of tasks", async () => {
   const server = app.listen(0, "127.0.0.1");
-await new Promise((resolve, reject) => {
-  server.once("listening", resolve);
-  server.once("error", reject);
-});
+  await new Promise((resolve, reject) => {
+    server.once("listening", resolve);
+    server.once("error", reject);
+  });
 
   try {
     const { port } = server.address();
@@ -43,6 +44,62 @@ await new Promise((resolve, reject) => {
       assert.equal(typeof task.title, "string");
       assert.equal(typeof task.completed, "boolean");
     }
+  } finally {
+    await new Promise((resolve) => server.close(resolve));
+  }
+});
+
+test("POST /tasks creates a new task and returns 201", async () => {
+  const server = app.listen(0, "127.0.0.1");
+  await new Promise((resolve, reject) => {
+    server.once("listening", resolve);
+    server.once("error", reject);
+  });
+
+  try {
+    const { port } = server.address();
+    const response = await fetch(`http://127.0.0.1:${port}/tasks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Read challenge instructions" }),
+    });
+
+    assert.equal(response.status, 201);
+    const createdTask = await response.json();
+
+    assert.ok("id" in createdTask);
+    assert.equal(createdTask.title, "Read challenge instructions");
+    assert.equal(createdTask.completed, false);
+  } finally {
+    await new Promise((resolve) => server.close(resolve));
+  }
+});
+
+test("POST /tasks returns 400 when title is missing or blank", async () => {
+  const server = app.listen(0, "127.0.0.1");
+  await new Promise((resolve, reject) => {
+    server.once("listening", resolve);
+    server.once("error", reject);
+  });
+
+  try {
+    const { port } = server.address();
+
+    // 1. Missing title property
+    const resMissing = await fetch(`http://127.0.0.1:${port}/tasks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    assert.equal(resMissing.status, 400);
+
+    // 2. Empty string or whitespace title
+    const resEmpty = await fetch(`http://127.0.0.1:${port}/tasks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "   " }),
+    });
+    assert.equal(resEmpty.status, 400);
   } finally {
     await new Promise((resolve) => server.close(resolve));
   }
