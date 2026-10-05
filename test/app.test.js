@@ -45,3 +45,48 @@ test("tasks returns a list", async () => {
     completed: false,
   });
 });
+
+test("returns 400 when creating a task with an empty title", async () => {
+  const server = await new Promise((resolve) => {
+    const instance = app.listen(0, () => resolve(instance));
+  });
+
+  const response = await fetch(
+    `http://localhost:${server.address().port}/tasks`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title: "" }),
+    },
+  );
+
+  server.close();
+
+  assert.equal(response.status, 400);
+});
+
+test("creates a task", async () => {
+  const server = await new Promise((resolve) => {
+    const instance = app.listen(0, () => resolve(instance));
+  });
+
+  const response = await fetch(
+    `http://localhost:${server.address().port}/tasks`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title: "New task" }),
+    },
+  );
+
+  const task = await response.json();
+  server.close();
+
+  assert.equal(response.status, 201);
+  assert.equal(task.title, "New task");
+  assert.equal(typeof task.id, "number");
+});
