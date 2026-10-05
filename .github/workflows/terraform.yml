@@ -1,0 +1,39 @@
+name: Terraform Validation
+
+on:
+  push:
+    paths:
+      - '**/*.tf'
+      - '**/*.tfvars'
+      - '.github/workflows/terraform.yml'
+  pull_request:
+    paths:
+      - '**/*.tf'
+      - '**/*.tfvars'
+      - '.github/workflows/terraform.yml'
+
+jobs:
+  validate:
+    name: Check and Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Télécharge le code du dépôt sur la machine virtuelle
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Installe la CLI Terraform officielle sur la machine virtuelle
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # 3. Vérifie que le code Terraform est bien formaté (indiqué dans les consignes)
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      # 4. Initialise le projet Terraform (télécharge les providers locaux/nécessaires)
+      - name: Terraform Init
+        run: terraform init
+
+      # 5. Valide la syntaxe et la cohérence des fichiers Terraform
+      - name: Terraform Validate
+        run: terraform validate
