@@ -4,7 +4,6 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 function calculateTotal(items) {
-  // INTENTIONAL DEFECT: students must diagnose this using the tests.
   return items.reduce((total, item) => total + item.price * item.quantity, 0);
 }
 
