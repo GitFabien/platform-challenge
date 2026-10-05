@@ -1,6 +1,8 @@
 const express = require("express");
 
 const app = express();
+app.use(express.json());
+
 const port = process.env.PORT || 3000;
 
 const tasks = [
@@ -26,6 +28,23 @@ app.get("/health", (_req, res) => {
 
 app.get("/tasks", (_req, res) => {
   res.status(200).json(tasks);
+});
+
+app.patch("/tasks/:id", (req, res) => {
+  const { completed } = req.body;
+
+  if (typeof completed !== "boolean") {
+    return res.status(400).json({ error: "completed must be a boolean" });
+  }
+
+  const task = tasks.find((task) => task.id === Number(req.params.id));
+
+  if (!task) {
+    return res.status(404).json({ error: "Task not found" });
+  }
+
+  task.completed = completed;
+  return res.status(200).json(task);
 });
 
 app.get("/total", (_req, res) => {
