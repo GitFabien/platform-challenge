@@ -28,10 +28,24 @@ app.get("/total", (_req, res) => {
   res.json({ total: calculateTotal(items) });
 });
 
+const tasks = [];
+
+app.delete("/tasks/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const index = tasks.findIndex((task) => task.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ error: "Task not found" });
+  }
+
+  tasks.splice(index, 1);
+  return res.status(204).end();
+});
+
 if (require.main === module) {
   app.listen(port, () => {
     console.log(`Application listening on port ${port}`);
   });
 }
 
-module.exports = { app, calculateTotal };
+module.exports = { app, calculateTotal, tasks };
