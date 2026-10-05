@@ -1,7 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { app } = require("../src/app");
-const { tasks, resetTasks } = require("../src/tasks");
+const { app, tasks } = require("../src/app");
 
 let server;
 let baseUrl;
@@ -17,7 +16,7 @@ test.after(() => {
 });
 
 test.beforeEach(() => {
-  resetTasks();
+  tasks.length = 0;
   tasks.push({ id: 1, title: "Write README", completed: false });
 });
 
